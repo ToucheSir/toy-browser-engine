@@ -39,8 +39,11 @@ public class StyledNode {
 	}
 
 	public Display display() {
-		return value("display").map(val -> (KeywordValue) val).map(KeywordValue::getValue)
-				.map(Display::find).get();
+		return value("display")
+				.map(val -> (KeywordValue) val)
+				.map(KeywordValue::getValue)
+				.map(Display::find)
+				.orElseGet(() -> Display.INLINE);
 	}
 
 	private static boolean matchesSimpleSelector(ElementData elem, SimpleSelector selector) {

@@ -1,4 +1,4 @@
-* { display: block; padding: 12px; }
+div { display: block; padding: 12px; }
 .a { background: #ff0000; }
 .b { background: #ffa500; }
 .c { background: #ffff00; }
@@ -6,3 +6,4 @@
 .e { background: #0000ff; }
 .f { background: #4b0082; }
 .g { background: #800080; }
+.h { background: #008000; }

@@ -72,13 +72,11 @@ public class LayoutBox {
 		case ANONYMOUS_BLOCK:
 			return this;
 		case BLOCK_NODE:
-			LayoutBox lastChild = children.get(children.size() - 1);
-			if (children.size() > 0
-					&& !lastChild.boxType.getType().equals(BoxType.ANONYMOUS_BLOCK)) {
+			if (children.isEmpty()) {
 				children.add(new LayoutBox(new AnonymousBlock()));
 			}
-
-			return lastChild;
+			
+			return children.get(children.size() - 1);
 		default:
 			throw new IllegalStateException("layout box does not have an inline container");
 		}
