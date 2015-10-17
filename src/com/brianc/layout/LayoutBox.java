@@ -72,6 +72,8 @@ public class LayoutBox {
 		case ANONYMOUS_BLOCK:
 			return this;
 		case BLOCK_NODE:
+			// TODO: do not generate unecessary anonymous block box if block node
+			// only has inline child(ren)
 			if (children.isEmpty()) {
 				children.add(new LayoutBox(new AnonymousBlock()));
 			}
@@ -88,9 +90,16 @@ public class LayoutBox {
 			layoutBlock(containingBlock);
 			break;
 		case INLINE_NODE:
+			layoutInline(containingBlock);
 		case ANONYMOUS_BLOCK:
 		default:
 		}
+	}
+
+	private void layoutInline(Dimensions containingBlock) {
+		// TODO inline layout as per http://www.w3.org/TR/CSS2/visuren.html#inline-boxes
+		// and http://www.w3.org/TR/CSS2/visuren.html#inline-formatting
+		
 	}
 
 	void layoutBlock(Dimensions containingBlock) {
@@ -228,7 +237,7 @@ public class LayoutBox {
 		StringBuilder res = new StringBuilder();
 		String indent = lastIndent + "  ";
 
-		res.append(lastIndent).append(box.boxType).append(") {\n");
+		res.append(lastIndent).append(box.boxType).append(" {\n");
 
 		for (LayoutBox child : box.children) {
 			res.append(stringifyLayoutBox(child, indent)).append("\n");
