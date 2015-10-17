@@ -9,6 +9,7 @@ import com.brianc.css.KeywordValue;
 import com.brianc.css.LengthValue;
 import com.brianc.css.Unit;
 import com.brianc.css.Value;
+import com.brianc.layout.BoxType.Type;
 import com.brianc.style.StyledNode;
 
 public class LayoutBox {
@@ -25,27 +26,27 @@ public class LayoutBox {
 		this.boxType = boxType;
 		this.children = children;
 	}
-	
+
 	public List<LayoutBox> getChildren() {
 		return children;
 	}
-	
+
 	public Dimensions getDimensions() {
 		return dimensions;
 	}
-	
+
 	public BoxType getType() {
 		return boxType;
 	}
 
 	public static LayoutBox layoutTree(StyledNode node, Dimensions containingBlock) {
 		containingBlock.content.height = 0;
-		
+
 		LayoutBox rootBox = buildLayoutTree(node);
 		rootBox.layout(containingBlock);
 		return rootBox;
 	}
-	
+
 	private static LayoutBox buildLayoutTree(StyledNode styleNode) {
 		LayoutBox root = new LayoutBox(BoxType.Type.fromDisplay(styleNode.display(), styleNode));
 
@@ -72,13 +73,15 @@ public class LayoutBox {
 		case ANONYMOUS_BLOCK:
 			return this;
 		case BLOCK_NODE:
-			// TODO: do not generate unecessary anonymous block box if block node
+			// TODO: do not generate unnecessary anonymous block box if block
+			// node
 			// only has inline child(ren)
-			if (children.isEmpty()) {
+			if (children.stream().allMatch(c -> c.boxType.getType() == Type.INLINE_NODE)) {
+				return this;
+			} else {
 				children.add(new LayoutBox(new AnonymousBlock()));
+				return children.get(children.size() - 1);
 			}
-			
-			return children.get(children.size() - 1);
 		default:
 			throw new IllegalStateException("layout box does not have an inline container");
 		}
@@ -97,9 +100,22 @@ public class LayoutBox {
 	}
 
 	private void layoutInline(Dimensions containingBlock) {
-		// TODO inline layout as per http://www.w3.org/TR/CSS2/visuren.html#inline-boxes
+		// TODO inline layout as per
+		// http://www.w3.org/TR/CSS2/visuren.html#inline-boxes
 		// and http://www.w3.org/TR/CSS2/visuren.html#inline-formatting
-		
+		calculateInlineWidth(containingBlock);
+		calculateInlinePosition(containingBlock);
+//		layoutInlineChildren();
+		calculateInlineHeight();		
+	}
+
+	private void calculateInlineHeight() {
+	}
+
+	private void calculateInlinePosition(Dimensions containingBlock) {
+	}
+
+	private void calculateInlineWidth(Dimensions containingBlock) {
 	}
 
 	void layoutBlock(Dimensions containingBlock) {
@@ -119,8 +135,9 @@ public class LayoutBox {
 	private void layoutBlockChildren() {
 		for (LayoutBox child : children) {
 			child.layout(dimensions);
-			
-			dimensions.content.height = dimensions.content.height + child.dimensions.marginBox().height;
+
+			dimensions.content.height = dimensions.content.height
+					+ child.dimensions.marginBox().height;
 		}
 	}
 
@@ -160,8 +177,9 @@ public class LayoutBox {
 		Value paddingLeft = style.lookup("padding-left", "padding", zero);
 		Value paddingRight = style.lookup("padding-right", "padding", zero);
 
-		float total = (float) Stream.of(marginLeft, marginRight, borderLeft,
-				borderRight, paddingLeft, paddingRight, width).mapToDouble(v -> v.toPx()).sum();
+		float total = (float) Stream
+				.of(marginLeft, marginRight, borderLeft, borderRight, paddingLeft, paddingRight,
+						width).mapToDouble(v -> v.toPx()).sum();
 
 		if (width != auto && total > containingBlock.content.width) {
 			if (marginLeft == auto) {
@@ -219,15 +237,15 @@ public class LayoutBox {
 	private StyledNode getStyleNode() {
 		switch (boxType.getType()) {
 		case BLOCK_NODE:
-			return ((BlockNode)boxType).node;
+			return ((BlockNode) boxType).node;
 		case INLINE_NODE:
-			return ((InlineNode)boxType).node;
+			return ((InlineNode) boxType).node;
 		case ANONYMOUS_BLOCK:
 		default:
 			throw new IllegalAccessError("Anonymous block box has no style node");
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		return stringifyLayoutBox(this);
@@ -242,11 +260,11 @@ public class LayoutBox {
 		for (LayoutBox child : box.children) {
 			res.append(stringifyLayoutBox(child, indent)).append("\n");
 		}
-		
+
 		res.append(lastIndent).append("}");
 		return res.toString();
 	}
-	
+
 	private static String stringifyLayoutBox(LayoutBox box) {
 		return stringifyLayoutBox(box, "");
 	}

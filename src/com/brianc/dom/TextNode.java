@@ -16,6 +16,6 @@ public class TextNode extends Node {
 	
 	@Override
 	public String toString() {
-		return text;
+		return text.trim().replace("\n", ""); 
 	}
 }
