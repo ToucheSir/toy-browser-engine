@@ -218,5 +218,28 @@ public class LayoutBox {
 			throw new IllegalAccessError("Anonymous block box has no style node");
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return stringifyLayoutBox(this);
+	}
+
+	private static String stringifyLayoutBox(LayoutBox box, String lastIndent) {
+		StringBuilder res = new StringBuilder();
+		String indent = lastIndent + "  ";
+
+		res.append(lastIndent).append(box.boxType).append(") {\n");
+
+		for (LayoutBox child : box.children) {
+			res.append(stringifyLayoutBox(child, indent)).append("\n");
+		}
+		
+		res.append(lastIndent).append("}");
+		return res.toString();
+	}
+	
+	private static String stringifyLayoutBox(LayoutBox box) {
+		return stringifyLayoutBox(box, "");
+	}
 
 }

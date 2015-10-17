@@ -6,4 +6,9 @@ public class AnonymousBlock implements BoxType {
 	public Type getType() {
 		return Type.ANONYMOUS_BLOCK;
 	}
+	
+	@Override
+	public String toString() {
+		return getType().toString();
+	}
 }

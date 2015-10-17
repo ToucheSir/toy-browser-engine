@@ -1,5 +1,7 @@
 package com.brianc.painting;
 
+import java.awt.Graphics2D;
+
 import com.brianc.css.Color;
 import com.brianc.layout.Rect;
 
@@ -11,4 +13,10 @@ public class SolidColor implements DisplayCommand {
 		this.color = color;
 		this.rect = rect;
 	}	
+	
+	@Override
+	public void paint(Graphics2D g, Canvas canvas) {
+		g.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
+		g.fill(rect);
+	}
 }

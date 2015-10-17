@@ -9,20 +9,18 @@ import com.brianc.layout.Rect;
 public class Canvas {
 	private BufferedImage buffer;
 	private Graphics2D g;
+	private int width;
+	private int height;
 	
 	public Canvas(int width, int height) {
+		this.width = width;
+		this.height = height;
 		buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		g = buffer.createGraphics();
 	}
 	
 	void paintItem(DisplayCommand item) {
-		if (item instanceof SolidColor) {
-			Color color = ((SolidColor)item).color;
-			Rect rect = ((SolidColor)item).rect;
-			System.out.println(rect);
-			g.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
-			g.fill(rect);
-		}
+		item.paint(g, this);
 	}
 	
 	void endPaint() {
@@ -31,5 +29,13 @@ public class Canvas {
 	
 	public BufferedImage getBuffer() {
 		return buffer;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 }

@@ -6,7 +6,11 @@ import java.util.Optional;
 
 import com.brianc.css.Color;
 import com.brianc.css.ColorValue;
+import com.brianc.dom.Node;
+import com.brianc.dom.NodeType;
+import com.brianc.dom.TextNode;
 import com.brianc.layout.BoxType;
+import com.brianc.layout.BoxType.Type;
 import com.brianc.layout.Dimensions;
 import com.brianc.layout.LayoutBox;
 import com.brianc.layout.Rect;
@@ -20,11 +24,35 @@ public class Painter {
 	}
 
 	private static void renderLayoutBox(List<DisplayCommand> displayList, LayoutBox layoutBox) {
+		System.out.println(layoutBox);
 		renderBackground(displayList, layoutBox);
 		renderBorders(displayList, layoutBox);
+		renderText(displayList, layoutBox);
 
 		for (LayoutBox child : layoutBox.getChildren()) {
 			renderLayoutBox(displayList, child);
+		}
+	}
+
+	private static void renderText(List<DisplayCommand> displayList, LayoutBox layoutBox) {
+		// there needs to be some major refactoring before this is less ugly.
+		// TODO eliminate the current wonky lookup for extracting a node 
+		// TODO include the parent box when rendering text without using this check
+		// FIXME text rendering is not contained because inline layout and cascading(?) do not exist yet.
+		BoxType layoutBoxType = layoutBox.getType();
+		if (layoutBoxType.getType() == Type.INLINE_NODE) {
+			Node sourceNode = layoutBoxType.getStyle().getNode();
+
+			if (sourceNode.getType() == NodeType.TEXT) {
+				Optional<Color> colorVal = getColor(layoutBox, "color");
+				Color fontColor = colorVal.orElse(Color.BLACK);
+
+				Dimensions dims = layoutBox.getDimensions();
+				Rect paddingBox = dims.paddingBox();
+				String text = ((TextNode) sourceNode).getText();
+
+				displayList.add(new RenderText(text, fontColor, paddingBox));
+			}
 		}
 	}
 
@@ -72,16 +100,16 @@ public class Painter {
 			return Optional.empty();
 		}
 	}
-	
+
 	public static Canvas paint(LayoutBox layoutRoot, Rect bounds) {
 		List<DisplayCommand> displayList = buildDisplayList(layoutRoot);
-		Canvas canvas = new Canvas((int)bounds.width, (int)bounds.height);
+		Canvas canvas = new Canvas((int) bounds.width, (int) bounds.height);
 		System.out.println(displayList);
-		
+
 		for (DisplayCommand item : displayList) {
 			canvas.paintItem(item);
 		}
-		
+
 		canvas.endPaint();
 		return canvas;
 	}

@@ -18,4 +18,9 @@ public class BlockNode implements BoxType {
 	public StyledNode getStyle() throws UnsupportedOperationException {
 		return node;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s(%s)", getType(), node.getNode());
+	}
 }

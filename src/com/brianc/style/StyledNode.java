@@ -19,7 +19,11 @@ import com.brianc.dom.Node;
 import com.brianc.dom.NodeType;
 
 public class StyledNode {
-	Node node;
+	private Node node;
+	public Node getNode() {
+		return node;
+	}
+
 	Map<String, Value> specifiedValues;
 	public final List<StyledNode> children;
 
