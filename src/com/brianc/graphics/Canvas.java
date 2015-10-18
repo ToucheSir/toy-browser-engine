@@ -1,4 +1,4 @@
-package com.brianc.painting;
+package com.brianc.graphics;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

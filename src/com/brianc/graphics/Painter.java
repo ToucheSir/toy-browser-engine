@@ -1,4 +1,4 @@
-package com.brianc.painting;
+package com.brianc.graphics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,14 +6,10 @@ import java.util.Optional;
 
 import com.brianc.css.Color;
 import com.brianc.css.ColorValue;
-import com.brianc.dom.Node;
-import com.brianc.dom.NodeType;
-import com.brianc.dom.TextNode;
-import com.brianc.layout.BoxType;
-import com.brianc.layout.BoxType.Type;
 import com.brianc.layout.Dimensions;
 import com.brianc.layout.LayoutBox;
 import com.brianc.layout.Rect;
+import com.brianc.layout.StyledLayoutBox;
 
 public class Painter {
 	private static List<DisplayCommand> buildDisplayList(LayoutBox layoutRoot) {
@@ -39,9 +35,9 @@ public class Painter {
 		// TODO eliminate the current wonky lookup for extracting a node 
 		// TODO include the parent box when rendering text without using this check
 		// FIXME text rendering is not contained because inline layout and cascading(?) do not exist yet.
-		BoxType layoutBoxType = layoutBox.getType();
-		if (layoutBoxType.getType() == Type.INLINE_NODE) {
-			Node sourceNode = layoutBoxType.getStyle().getNode();
+		/*
+		if (layoutBox.getType() == BoxType.INLINE_NODE) {
+			Node sourceNode = layoutBox.getStyle().getNode();
 
 			if (sourceNode.getType() == NodeType.TEXT) {
 				Optional<Color> colorVal = getColor(layoutBox, "color");
@@ -54,6 +50,7 @@ public class Painter {
 				displayList.add(new RenderText(text, fontColor, paddingBox));
 			}
 		}
+		*/
 	}
 
 	private static void renderBorders(List<DisplayCommand> displayList, LayoutBox layoutBox) {
@@ -89,11 +86,10 @@ public class Painter {
 	}
 
 	private static Optional<Color> getColor(LayoutBox layoutBox, String name) {
-		BoxType boxType = layoutBox.getType();
-		switch (boxType.getType()) {
+		switch (layoutBox.getType()) {
 		case BLOCK_NODE:
 		case INLINE_NODE:
-			return boxType.getStyle().value(name).filter(val -> (val instanceof ColorValue))
+			return ((StyledLayoutBox)layoutBox).getStyledNode().value(name).filter(val -> (val instanceof ColorValue))
 					.map(val -> ((ColorValue) val).getColor());
 		case ANONYMOUS_BLOCK:
 		default:
