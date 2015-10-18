@@ -22,4 +22,15 @@ public class LengthValue implements Value {
 	public String toString() {
 		return String.format("LengthValue(%f, %s)", length, unit);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof LengthValue) {
+			LengthValue asLength = (LengthValue)obj;
+			
+			return asLength.length == length && asLength.unit == unit;
+		}
+		
+		return false;
+	}
 }

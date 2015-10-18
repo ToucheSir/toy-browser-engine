@@ -3,6 +3,7 @@ package com.brianc.layout;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.brianc.graphics.ImageRenderer;
 import com.brianc.graphics.Renderer;
 import com.brianc.style.Display;
 import com.brianc.style.StyledNode;
@@ -34,11 +35,11 @@ public abstract class LayoutBox {
 		return dimensions;
 	}
 
-	public static LayoutBox layoutTree(StyledNode node, Dimensions containingBlock, Renderer imgRenderer) {
+	public static LayoutBox layoutTree(StyledNode node, Dimensions containingBlock, Renderer renderBackend) {
 		containingBlock.content.height = 0;
 
 		LayoutBox rootBox = buildLayoutTree(node);
-		rootBox.layout(containingBlock);
+		rootBox.layout(containingBlock, renderBackend);
 		return rootBox;
 	}
 
@@ -95,7 +96,7 @@ public abstract class LayoutBox {
 		}
 	}
 
-	abstract void layout(Dimensions containingBlock); 
+	abstract void layout(Dimensions containingBlock, Renderer renderBackend); 
 /*	{ switch (getType()) {
 		case BLOCK_NODE:
 			layoutBlock(containingBlock);

@@ -1,5 +1,7 @@
 package com.brianc.layout;
 
+import com.brianc.graphics.Renderer;
+
 public class AnonymousBlockBox extends LayoutBox {
 	@Override
 	public BoxType getType() {
@@ -7,6 +9,6 @@ public class AnonymousBlockBox extends LayoutBox {
 	}
 
 	@Override
-	public void layout(Dimensions containingBlock) {
+	void layout(Dimensions containingBlock, Renderer renderBackend) {
 	}
 }

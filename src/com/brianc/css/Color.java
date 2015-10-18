@@ -5,7 +5,7 @@ public class Color {
 	public final short g;
 	public final short b;
 	public final short a;
-	
+
 	public static final Color BLACK = new Color(0, 0, 0, 255);
 
 	public Color(short r, short g, short b, short a) {
@@ -14,9 +14,9 @@ public class Color {
 		this.b = b;
 		this.a = a;
 	}
-	
+
 	public Color(int r, int g, int b, int a) {
-		this((short)r, (short)g, (short)b, (short)a);
+		this((short) r, (short) g, (short) b, (short) a);
 	}
 
 	@Override
@@ -24,4 +24,13 @@ public class Color {
 		return String.format("rgba(%d,%d,%d,%d)", r, g, b, a);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Color) {
+			Color other = (Color) obj;
+			return r == other.r && g == other.g && b == other.b && a == other.a;
+		}
+
+		return false;
+	}
 }

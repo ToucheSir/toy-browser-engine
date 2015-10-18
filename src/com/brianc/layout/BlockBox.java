@@ -7,6 +7,7 @@ import com.brianc.css.KeywordValue;
 import com.brianc.css.LengthValue;
 import com.brianc.css.Unit;
 import com.brianc.css.Value;
+import com.brianc.graphics.Renderer;
 import com.brianc.style.StyledNode;
 
 public class BlockBox extends LayoutBox implements StyledLayoutBox {
@@ -22,10 +23,11 @@ public class BlockBox extends LayoutBox implements StyledLayoutBox {
 		return BoxType.BLOCK_NODE;
 	}
 
-	void layout(Dimensions containingBlock) {
+	@Override
+	void layout(Dimensions containingBlock, Renderer renderBackend) {
 		calculateBlockWidth(containingBlock);
 		calculateBlockPosition(containingBlock);
-		layoutBlockChildren();
+		layoutBlockChildren(renderBackend);
 		calculateBlockHeight();
 	}
 
@@ -36,12 +38,11 @@ public class BlockBox extends LayoutBox implements StyledLayoutBox {
 		}
 	}
 
-	private void layoutBlockChildren() {
+	private void layoutBlockChildren(Renderer renderBackend) {
 		for (LayoutBox child : children) {
-			child.layout(dimensions);
+			child.layout(dimensions, renderBackend);
 
-			dimensions.content.height = dimensions.content.height
-					+ child.dimensions.marginBox().height;
+			dimensions.content.height += child.dimensions.marginBox().height;
 		}
 	}
 
@@ -82,21 +83,21 @@ public class BlockBox extends LayoutBox implements StyledLayoutBox {
 		float total = (float) Stream.of(marginLeft, marginRight, borderLeft, borderRight,
 				paddingLeft, paddingRight, width).mapToDouble(v -> v.toPx()).sum();
 
-		if (width != auto && total > containingBlock.content.width) {
-			if (marginLeft == auto) {
+		if (!width.equals(auto) && total > containingBlock.content.width) {
+			if (marginLeft.equals(auto)) {
 				marginLeft = zero;
 			}
 
-			if (marginRight == auto) {
+			if (marginRight.equals(auto)) {
 				marginRight = zero;
 			}
 		}
 
 		float underflow = containingBlock.content.width - total;
 
-		boolean widthIsAuto = width == auto;
-		boolean leftIsAuto = marginLeft == auto;
-		boolean rightIsAuto = marginRight == auto;
+		boolean widthIsAuto = width.equals(auto);
+		boolean leftIsAuto = marginLeft.equals(auto);
+		boolean rightIsAuto = marginRight.equals(auto);
 
 		if (!widthIsAuto) {
 			if (!leftIsAuto && rightIsAuto) {
@@ -110,10 +111,13 @@ public class BlockBox extends LayoutBox implements StyledLayoutBox {
 				marginRight = new LengthValue(underflow / 2, Unit.PX);
 			}
 		} else {
-			if (marginLeft == auto)
+			if (marginLeft.equals(auto)) {
 				marginLeft = zero;
-			if (marginRight == auto)
+			}
+			
+			if (marginRight.equals(auto)) {
 				marginRight = zero;
+			}
 
 			if (underflow >= 0) {
 				width = new LengthValue(underflow, Unit.PX);

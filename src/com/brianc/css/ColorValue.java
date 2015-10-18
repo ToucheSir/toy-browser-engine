@@ -20,4 +20,14 @@ public class ColorValue implements Value {
 	public String toString() {
 		return "ColorValue(" + color + ")";
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ColorValue) {
+			ColorValue asColor = (ColorValue)obj;
+			return color.equals(asColor.color);
+		}
+		
+		return false;
+	}
 }

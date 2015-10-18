@@ -15,7 +15,7 @@ public class SolidColor implements DisplayCommand {
 	}	
 	
 	@Override
-	public void paint(Graphics2D g, Canvas canvas) {
+	public void paint(Graphics2D g) {
 		g.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
 		g.fill(rect);
 	}

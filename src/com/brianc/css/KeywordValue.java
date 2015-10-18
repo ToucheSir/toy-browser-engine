@@ -19,4 +19,15 @@ public class KeywordValue implements Value {
 	public String toString() {
 		return "KeywordValue(" + keyword + ")";
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof KeywordValue) {
+			KeywordValue asKeyword = (KeywordValue)obj;
+			
+			return this.keyword.equals(asKeyword.keyword);
+		}
+		
+		return false;
+	}
 }

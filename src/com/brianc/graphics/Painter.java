@@ -1,12 +1,20 @@
 package com.brianc.graphics;
 
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.brianc.css.Color;
 import com.brianc.css.ColorValue;
+import com.brianc.dom.Node;
+import com.brianc.dom.NodeType;
+import com.brianc.dom.TextNode;
+import com.brianc.layout.BoxType;
 import com.brianc.layout.Dimensions;
+import com.brianc.layout.Fragment;
+import com.brianc.layout.InlineBox;
+import com.brianc.layout.InlineBox.LineBox;
 import com.brianc.layout.LayoutBox;
 import com.brianc.layout.Rect;
 import com.brianc.layout.StyledLayoutBox;
@@ -21,36 +29,46 @@ public class Painter {
 
 	private static void renderLayoutBox(List<DisplayCommand> displayList, LayoutBox layoutBox) {
 		System.out.println(layoutBox);
-		renderBackground(displayList, layoutBox);
-		renderBorders(displayList, layoutBox);
-		renderText(displayList, layoutBox);
-
-		for (LayoutBox child : layoutBox.getChildren()) {
-			renderLayoutBox(displayList, child);
+		switch (layoutBox.getType()) {
+		case BLOCK_NODE:
+			renderBackground(displayList, layoutBox);
+			renderBorders(displayList, layoutBox);
+			for (LayoutBox child : layoutBox.getChildren()) {
+				renderLayoutBox(displayList, child);
+			}
+			break;
+		case INLINE_NODE:
+			InlineBox box = (InlineBox)layoutBox;
+			
+			for (LineBox line : box.getLines()) {
+				renderLine(line);
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
-	private static void renderText(List<DisplayCommand> displayList, LayoutBox layoutBox) {
+	private static void renderText(List<DisplayCommand> displayList, InlineBox layoutBox) {
 		// there needs to be some major refactoring before this is less ugly.
 		// TODO eliminate the current wonky lookup for extracting a node 
 		// TODO include the parent box when rendering text without using this check
 		// FIXME text rendering is not contained because inline layout and cascading(?) do not exist yet.
-		/*
-		if (layoutBox.getType() == BoxType.INLINE_NODE) {
-			Node sourceNode = layoutBox.getStyle().getNode();
+		Node sourceNode = layoutBox.getStyledNode().getNode();
 
-			if (sourceNode.getType() == NodeType.TEXT) {
-				Optional<Color> colorVal = getColor(layoutBox, "color");
-				Color fontColor = colorVal.orElse(Color.BLACK);
+		if (sourceNode.getType() == NodeType.TEXT) {
+			Optional<Color> colorVal = getColor(layoutBox, "color");
+			Color fontColor = colorVal.orElse(Color.BLACK);
 
-				Dimensions dims = layoutBox.getDimensions();
-				Rect paddingBox = dims.paddingBox();
-				String text = ((TextNode) sourceNode).getText();
+			Dimensions dims = layoutBox.getDimensions();
+			Rect paddingBox = dims.paddingBox();
+			String text = ((TextNode) sourceNode).getText();
+			List<LineBox> lines = layoutBox.getLines();
 
-				displayList.add(new RenderText(text, fontColor, paddingBox));
-			}
+
+			displayList.add(new RenderText(text, lines, paddingBox, fontColor));
 		}
-		*/
+
 	}
 
 	private static void renderBorders(List<DisplayCommand> displayList, LayoutBox layoutBox) {
@@ -97,16 +115,15 @@ public class Painter {
 		}
 	}
 
-	public static Canvas paint(LayoutBox layoutRoot, Rect bounds) {
+	public static void paint(LayoutBox layoutRoot, Rect bounds, Renderer renderBackend) {
 		List<DisplayCommand> displayList = buildDisplayList(layoutRoot);
-		Canvas canvas = new Canvas((int) bounds.width, (int) bounds.height);
+		Graphics2D graphicsContext = renderBackend.getGraphicsContext();
 		System.out.println(displayList);
 
 		for (DisplayCommand item : displayList) {
-			canvas.paintItem(item);
+			item.paint(graphicsContext);
 		}
 
-		canvas.endPaint();
-		return canvas;
+		graphicsContext.dispose();
 	}
 }
