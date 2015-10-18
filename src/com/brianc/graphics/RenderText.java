@@ -1,13 +1,12 @@
 package com.brianc.graphics;
 
 import java.awt.Graphics2D;
-import java.awt.font.TextLayout;
+import java.awt.geom.Point2D;
 import java.util.List;
 
 import com.brianc.css.Color;
 import com.brianc.layout.InlineBox.LineBox;
 import com.brianc.layout.Rect;
-import com.sun.javafx.geom.Point2D;
 
 public class RenderText implements DisplayCommand {
 	private String text;
@@ -24,7 +23,7 @@ public class RenderText implements DisplayCommand {
 	
 	@Override
 	public void paint(Graphics2D g) {
-		Point2D drawCoords = new Point2D(rect.x, rect.y);
+		Point2D.Float drawCoords = new Point2D.Float(rect.x, rect.y);
 		g.setColor(new java.awt.Color(color.r, color.g, color.b, color.a));
 
 		for (LineBox line : lines) {

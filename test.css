@@ -7,3 +7,10 @@ div { display: block; padding: 12px; }
 .f { background: #4b0082; }
 .g { background: #800080; }
 .h { background: #008000; }
+.foo { 
+	border-color: #204080;
+	border-left-width: 10px; 
+	border-right-width: 10px; 
+	border-top-width: 10px; 
+	border-bottom-width: 10px; 
+}

@@ -52,8 +52,8 @@ public class BlockBox extends LayoutBox implements StyledLayoutBox {
 		dimensions.margin.top = styledNode.lookup("margin-top", "margin", zero).toPx();
 		dimensions.margin.bottom = styledNode.lookup("margin-bottom", "margin", zero).toPx();
 
-		dimensions.margin.top = styledNode.lookup("border-left", "border", zero).toPx();
-		dimensions.margin.bottom = styledNode.lookup("border-right", "border", zero).toPx();
+		dimensions.border.top = styledNode.lookup("border-left", "border", zero).toPx();
+		dimensions.border.bottom = styledNode.lookup("border-right", "border", zero).toPx();
 
 		dimensions.padding.top = styledNode.lookup("padding-left", "padding", zero).toPx();
 		dimensions.padding.bottom = styledNode.lookup("padding-right", "padding", zero).toPx();

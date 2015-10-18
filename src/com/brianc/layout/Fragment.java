@@ -14,7 +14,12 @@ public class Fragment {
 	public Fragment(InlineBox box, int startPos, int endPos, TextLayout lineLayout) {
 		this.box = box;
 		this.nodeRef = box.getStyledNode();
+		this.lineLayout = lineLayout;
 		this.startPos = startPos;
 		this.endPos = endPos;
+	}
+	
+	public TextLayout getLayout() {
+		return lineLayout;
 	}
 }
