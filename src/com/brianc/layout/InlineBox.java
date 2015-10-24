@@ -49,14 +49,14 @@ public class InlineBox extends LayoutBox implements StyledLayoutBox {
 		return lines;
 	}
 
-	private void layout(Dimensions containingBlock, Renderer renderBackend, LineBox lastLine) {
+	private void layout(Dimensions containingBlock, InlineBox inlineRoot, Renderer renderBackend, LineBox lastLine) {
 		layoutInlineMaxWidth(containingBlock);
-		reCalcLines(containingBlock, lastLine, renderBackend);
+		reCalcLines(containingBlock, inlineRoot, lastLine, renderBackend);
 
 		for (LayoutBox child : children) {
 			// TODO block children?
 			InlineBox childAsInline = (InlineBox) child;
-			childAsInline.layout(dimensions, renderBackend, lastLine);
+			childAsInline.layout(dimensions, inlineRoot, renderBackend, lastLine);
 
 			lines.addAll(childAsInline.lines);
 		}
@@ -93,17 +93,17 @@ public class InlineBox extends LayoutBox implements StyledLayoutBox {
 		// http://www.w3.org/TR/CSS2/visuren.html#inline-boxes
 		// and http://www.w3.org/TR/CSS2/visuren.html#inline-formatting
 		if (lines.isEmpty()) {
-			lines.add(new LineBox());
+			lines.add(new LineBox(this));
 		}
 
-		layout(containingBlock, renderBackend, getLastLine());
+		layout(containingBlock, this, renderBackend, getLastLine());
 	}
 
 	private LineBox getLastLine() {
 		return lines.getLast();
 	}
 
-	private void reCalcLines(Dimensions dimensions, LineBox lastLine, Renderer renderBackend) {
+	private void reCalcLines(Dimensions dimensions, InlineBox inlineRoot, LineBox lastLine, Renderer renderBackend) {
 		Node domNode = styledNode.getNode();
 
 		if (domNode.getType() == NodeType.TEXT) {
@@ -123,7 +123,7 @@ public class InlineBox extends LayoutBox implements StyledLayoutBox {
 				if (currentLine.filledWidth < contentMaxWidth) {
 					lineRemainingWidth = contentMaxWidth - currentLine.filledWidth;
 				} else {
-					currentLine = new LineBox(currentLine.rootBox);
+					currentLine = new LineBox(inlineRoot);
 					lines.add(currentLine);
 				}
 
@@ -198,8 +198,10 @@ public class InlineBox extends LayoutBox implements StyledLayoutBox {
 		private float filledWidth;
 		private float maxHeight;
 		private float lineHeight;
+		private InlineBox inlineRoot;
 		
-		public LineBox(InlineBox rootBox) {
+		public LineBox(InlineBox inlineRoot) {
+			this.inlineRoot = inlineRoot;
 			fragments = new ArrayList<>();
 		}
 
@@ -210,8 +212,8 @@ public class InlineBox extends LayoutBox implements StyledLayoutBox {
 
 			float fragmentHeight = layout.getAscent() - layout.getDescent();
 			maxHeight = Math.max(maxHeight, fragmentHeight);
-
-			if (fragment.box == rootBox) {
+			
+			if (inlineRoot.children.contains(fragment.box)) {
 				lineHeight = fragmentHeight;
 			}
 		}

@@ -47,34 +47,35 @@ public class Painter {
 				Color color = colorVal.get();
 				LineBox firstLine = lines.getFirst();
 				float boxHeight = firstLine.getBoxHeight();
-				float borderHeight = firstLine.getLineHeight() + dims.border.top + dims.border.bottom;
+				float lineHeight = firstLine.getLineHeight();
+				float borderHeight = lineHeight + dims.border.top + dims.border.bottom;
 
 				// left border
-				displayList.add(new SolidColor(color, new Rect(borderBox.x, borderBox.y + boxHeight - borderHeight,
-						dims.border.left, borderHeight)));
+				displayList.add(new SolidColor(color, new Rect(borderBox.x,
+						borderBox.y + boxHeight - lineHeight, dims.border.left, borderHeight)));
 
+				LineBox lastLine = lines.getLast();
 				// right border
-				displayList.add(new SolidColor(color, new Rect(borderBox.x + borderBox.width
-						- dims.border.right, borderBox.y + borderBox.height - 2 * borderHeight
-						- dims.border.top, dims.border.right, borderHeight)));
+				displayList.add(new SolidColor(color,
+						new Rect(borderBox.x + lastLine.getFilledWidth() + dims.border.left + dims.border.right,
+								borderBox.y + borderHeight * (lines.size() - 1), dims.border.right,
+								borderHeight)));
 
-				float lineX = dims.content.x;
+				float lineX = dims.content.x - dims.border.left;
 				float lineY = dims.content.y;
 
 				for (LineBox line : box.getLines()) {
 					// TODO proper line-height calculations
-					float lineHeight = line.getLineHeight();
-					float lineWidth = line.getFilledWidth();
+					float lineWidth = line.getFilledWidth() + dims.border.left + dims.border.right;
 
 					// top border
-					displayList.add(new SolidColor(color, new Rect(lineX, lineY - dims.border.top,
-							lineWidth, dims.border.top)));
+					displayList.add(new SolidColor(color,
+							new Rect(lineX, lineY - dims.border.top, lineWidth, dims.border.top)));
 					// bottom border
 					displayList.add(new SolidColor(color, new Rect(lineX, lineY + lineHeight,
 							lineWidth, dims.border.bottom)));
 
-					lineX += lineWidth;
-					lineY += lineHeight;
+					lineY += borderHeight;
 				}
 			}
 			break;
@@ -116,24 +117,27 @@ public class Painter {
 			Rect borderBox = dims.borderBox();
 
 			// left border
-			displayList.add(new SolidColor(color, new Rect(borderBox.x, borderBox.y,
-					dims.border.left, borderBox.height)));
+			displayList.add(new SolidColor(color,
+					new Rect(borderBox.x, borderBox.y, dims.border.left, borderBox.height)));
 			// right border
-			displayList.add(new SolidColor(color, new Rect(borderBox.x + borderBox.width
-					- dims.border.right, borderBox.y, dims.border.right, borderBox.height)));
+			displayList.add(new SolidColor(color,
+					new Rect(borderBox.x + borderBox.width - dims.border.right, borderBox.y,
+							dims.border.right, borderBox.height)));
 			// top border
-			displayList.add(new SolidColor(color, new Rect(borderBox.x, borderBox.y,
-					borderBox.width, dims.border.top)));
+			displayList.add(new SolidColor(color,
+					new Rect(borderBox.x, borderBox.y, borderBox.width, dims.border.top)));
 			// bottom border
-			displayList.add(new SolidColor(color, new Rect(borderBox.x, borderBox.y
-					+ borderBox.height - dims.border.bottom, borderBox.width, dims.border.bottom)));
+			displayList
+					.add(new SolidColor(color,
+							new Rect(borderBox.x,
+									borderBox.y + borderBox.height - dims.border.bottom,
+									borderBox.width, dims.border.bottom)));
 		}
 	}
 
 	private static void renderBackground(List<DisplayCommand> displayList, LayoutBox layoutBox) {
-		getColor(layoutBox, "background").map(
-				color -> displayList.add(new SolidColor(color, layoutBox.getDimensions()
-						.borderBox())));
+		getColor(layoutBox, "background").map(color -> displayList
+				.add(new SolidColor(color, layoutBox.getDimensions().borderBox())));
 	}
 
 	private static Optional<Color> getColor(LayoutBox layoutBox, String name) {
