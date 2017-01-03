@@ -7,8 +7,10 @@ import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.brianc.css.KeywordValue;
@@ -24,15 +26,19 @@ import com.brianc.style.StyledNode;
 public class InlineBox extends LayoutBox implements StyledLayoutBox {
 	private StyledNode styledNode;
 	private Deque<LineBox> lines;
-	private List<Fragment> fragments;
+	private Set<Fragment> fragments;
 
 	// TODO add list
+
+	public Set<Fragment> getFragments() {
+		return fragments;
+	}
 
 	public InlineBox(StyledNode styledNode) {
 		super();
 		this.styledNode = styledNode;
 		lines = new LinkedList<>();
-		fragments = new ArrayList<>();
+		fragments = new HashSet<>();
 	}
 
 	@Override
@@ -209,7 +215,8 @@ public class InlineBox extends LayoutBox implements StyledLayoutBox {
 			fragments.add(fragment);
 			filledWidth += fragment.lineLayout.getAdvance();
 			TextLayout layout = fragment.getLayout();
-
+			
+			// TODO: This assumes a default line-height of 1.0. 
 			float fragmentHeight = layout.getAscent() - layout.getDescent();
 			maxHeight = Math.max(maxHeight, fragmentHeight);
 			

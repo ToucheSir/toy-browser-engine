@@ -12,6 +12,7 @@ import com.brianc.dom.Node;
 import com.brianc.dom.NodeType;
 import com.brianc.dom.TextNode;
 import com.brianc.layout.Dimensions;
+import com.brianc.layout.Fragment;
 import com.brianc.layout.InlineBox;
 import com.brianc.layout.InlineBox.LineBox;
 import com.brianc.layout.LayoutBox;
@@ -57,7 +58,9 @@ public class Painter {
 				LineBox lastLine = lines.getLast();
 				// right border
 				displayList.add(new SolidColor(color,
-						new Rect(borderBox.x + lastLine.getFilledWidth() + dims.border.left + dims.border.right,
+						new Rect(
+								borderBox.x + lastLine.getFilledWidth() + dims.border.left
+										+ dims.border.right,
 								borderBox.y + borderHeight * (lines.size() - 1), dims.border.right,
 								borderHeight)));
 
@@ -67,13 +70,22 @@ public class Painter {
 				for (LineBox line : box.getLines()) {
 					// TODO proper line-height calculations
 					float lineWidth = line.getFilledWidth() + dims.border.left + dims.border.right;
+					float lineBoxHeight = line.getBoxHeight();
+
+					float fragmentX = lineX;
+					float fragmentY = lineY;
+					for (Fragment f : line.getFragments()) {
+						if (box.getFragments().contains(f)) {
+							renderFragment(f, line, fragmentX, fragmentY, displayList, layoutBox);
+						}
+					}
 
 					// top border
 					displayList.add(new SolidColor(color,
-							new Rect(lineX, lineY - dims.border.top, lineWidth, dims.border.top)));
+							new Rect(lineX, lineY + lineBoxHeight - lineHeight - dims.border.top, lineWidth, dims.border.top)));
 					// bottom border
-					displayList.add(new SolidColor(color, new Rect(lineX, lineY + lineHeight,
-							lineWidth, dims.border.bottom)));
+					displayList.add(new SolidColor(color,
+							new Rect(lineX, lineY + lineBoxHeight, lineWidth, dims.border.bottom)));
 
 					lineY += borderHeight;
 				}
@@ -82,6 +94,11 @@ public class Painter {
 		default:
 			break;
 		}
+	}
+
+	private static void renderFragment(Fragment f, LineBox line, float fragmentX, float fragmentY,
+			List<DisplayCommand> displayList, LayoutBox layoutBox) {
+
 	}
 
 	private static void renderText(List<DisplayCommand> displayList, InlineBox layoutBox) {
