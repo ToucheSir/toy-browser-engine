@@ -44,7 +44,7 @@ abstract class AbstractParser(// TODO Stream for efficiency?
     }
 
     protected fun consumeWhitespace() {
-        consumeWhile({ Character.isWhitespace(it) })
+        consumeWhile(Char::isWhitespace)
     }
 
 }

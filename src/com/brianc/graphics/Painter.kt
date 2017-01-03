@@ -98,10 +98,8 @@ object Painter {
     private fun renderText(displayList: List<DisplayCommand>, layoutBox: InlineBox) {
         // there needs to be some major refactoring before this is less ugly.
         // TODO eliminate the current wonky lookup for extracting a node
-        // TODO include the parent box when rendering text without using this
-        // check
-        // FIXME text rendering is not contained because inline layout and
-        // cascading(?) do not exist yet.
+        // TODO include the parent box when rendering text without using this check
+        // FIXME text rendering is not contained because inline layout and cascading(?) do not exist yet.
         val sourceNode = layoutBox.styledNode.node
 
         if (sourceNode.type == NodeType.TEXT) {

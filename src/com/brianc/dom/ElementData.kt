@@ -13,7 +13,6 @@ class ElementData(val tagName: String, internal var attributes: Map<String, Stri
         if (!attributes.containsKey("class")) {
             return HashSet()
         }
-
-        return hashSetOf(*(attributes["class"] ?: "").split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
+        return (attributes["class"] ?: "").split(" ").dropLastWhile(String::isEmpty).toHashSet()
     }
 }

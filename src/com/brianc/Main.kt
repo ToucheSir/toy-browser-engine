@@ -21,7 +21,6 @@ import com.brianc.layout.LayoutBox
 import com.brianc.style.StyledNode
 
 object Main {
-
     @JvmStatic fun main(args: Array<String>) {
         val htmlFile = "test.html"
         val styleSheetFile = "test.css"
@@ -46,7 +45,5 @@ object Main {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
     }
-
 }
