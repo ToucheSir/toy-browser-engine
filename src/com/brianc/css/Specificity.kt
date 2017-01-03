@@ -1,21 +1,7 @@
 package com.brianc.css
 
-import java.util.Comparator
+import kotlin.comparisons.compareValuesBy
 
-class Specificity(internal var a: Int, internal var b: Int, internal var c: Int) : Comparable<Specificity> {
-
-    override fun compareTo(other: Specificity): Int {
-        return cmp!!.compare(this, other)
-    }
-
-    companion object {
-
-        private var cmp: Comparator<Specificity>? = null
-
-        init {
-            // HACK to placate Java's type inference
-            cmp = Comparator.comparingInt<Specificity> { s -> s.a }
-            cmp = cmp!!.thenComparingInt { s -> s.b }.thenComparingInt { s -> s.c }
-        }
-    }
+data class Specificity(val a: Int, val b: Int, val c: Int) : Comparable<Specificity> {
+    override fun compareTo(other: Specificity) = compareValuesBy(this, other, { it.a }, { it.b }, { it.c })
 }

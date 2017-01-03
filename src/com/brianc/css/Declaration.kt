@@ -1,3 +1,3 @@
 package com.brianc.css
 
-class Declaration(val name: String, val value: Value)
+data class Declaration(val name: String, val value: Value)

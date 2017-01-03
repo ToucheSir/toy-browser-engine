@@ -1,6 +1,5 @@
 package com.brianc.dom
 
-import java.util.Arrays
 import java.util.HashSet
 import java.util.Optional
 

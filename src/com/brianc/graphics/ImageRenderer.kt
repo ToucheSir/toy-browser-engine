@@ -8,10 +8,9 @@ import com.brianc.layout.Rect
 
 class ImageRenderer(dimensions: Rect) : Renderer {
     override val graphicsContext: Graphics2D
-    val buffer: BufferedImage
+    val buffer: BufferedImage = BufferedImage(dimensions.width.toInt(), dimensions.height.toInt(), BufferedImage.TYPE_INT_ARGB)
 
     init {
-        buffer = BufferedImage(dimensions.width.toInt(), dimensions.height.toInt(), BufferedImage.TYPE_INT_ARGB)
         graphicsContext = buffer.createGraphics()
     }
 }

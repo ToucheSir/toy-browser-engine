@@ -19,7 +19,6 @@ class Fragment(internal var box: InlineBox, internal var startPos: Int, internal
     }
 
     companion object {
-
         val FIRST_FOR_ELEMENT = 1
         val LAST_FOR_ELEMENT = 2
     }

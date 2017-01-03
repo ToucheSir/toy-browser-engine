@@ -49,11 +49,9 @@ class BlockBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayoutB
         dimensions.padding.top = styledNode.lookup("padding-left", "padding", zero).toPx()
         dimensions.padding.bottom = styledNode.lookup("padding-right", "padding", zero).toPx()
 
-        dimensions.content.x = containingBlock.content.x + dimensions.margin.left
-        +dimensions.border.left + dimensions.padding.left
+        dimensions.content.x = containingBlock.content.x + dimensions.margin.left + dimensions.border.left + dimensions.padding.left
 
-        dimensions.content.y = containingBlock.content.height + containingBlock.content.y
-        +dimensions.margin.top + dimensions.border.top + dimensions.padding.left
+        dimensions.content.y = containingBlock.content.height + containingBlock.content.y + dimensions.margin.top + dimensions.border.top + dimensions.padding.left
 
     }
 
