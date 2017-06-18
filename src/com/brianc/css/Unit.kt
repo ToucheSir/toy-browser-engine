@@ -1,5 +1,5 @@
 package com.brianc.css
 
-enum class Unit {
-    PX
+enum class Unit(val conversionFactor: Float) {
+    PX(1f)
 }

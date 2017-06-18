@@ -1,7 +1,10 @@
 package com.brianc.graphics
 
-import java.awt.Graphics2D
+import com.brianc.css.Color
+import com.brianc.layout.InlineBox.LineBox
+import com.brianc.layout.Rect
 
-interface DisplayCommand {
-    fun paint(g: Graphics2D)
-}
+sealed class DisplayCommand
+
+data class SolidColor(val color: Color, val rect: Rect): DisplayCommand()
+data class RenderText(val text: String, val lines: List<LineBox>, val rect: Rect, val color: Color): DisplayCommand()

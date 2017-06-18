@@ -1,7 +1,8 @@
 package com.brianc.graphics
 
-import java.awt.Graphics2D
+import java.awt.font.FontRenderContext
 
 interface Renderer {
-    val graphicsContext: Graphics2D
+    fun draw(item: DisplayCommand)
+    val fontRenderContext: FontRenderContext
 }

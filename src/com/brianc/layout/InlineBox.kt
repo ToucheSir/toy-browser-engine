@@ -21,7 +21,9 @@ import com.brianc.dom.TextNode
 import com.brianc.graphics.Renderer
 import com.brianc.style.StyledNode
 
-class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayoutBox {
+class InlineBox(override val children: MutableList<LayoutBox> = mutableListOf(),
+                override val dimensions: Dimensions = Dimensions(),
+                override val styledNode: StyledNode) : StyledLayoutBox {
     val lines: Deque<LineBox>
     private val fragments: MutableSet<Fragment>
 
@@ -35,9 +37,6 @@ class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayout
         lines = LinkedList<LineBox>()
         fragments = HashSet<Fragment>()
     }
-
-    override val type: BoxType
-        get() = BoxType.INLINE_NODE
 
     private fun layout(containingBlock: Dimensions, inlineRoot: InlineBox, renderBackend: Renderer, lastLine: LineBox) {
         layoutInlineMaxWidth(containingBlock)
@@ -59,24 +58,29 @@ class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayout
         val maxLineWidth = (lines.map({ l -> l.filledWidth.toDouble() }).max() ?: 0.0).toFloat()
         val totalHeight = lines.map({ l -> l.boxHeight.toDouble() }).sum().toFloat()
 
-        dimensions.margin.top = styledNode.lookup("margin-top", "margin", zero).toPx()
-        dimensions.margin.bottom = styledNode.lookup("margin-bottom", "margin", zero).toPx()
+        dimensions.margin.top =
+                (styledNode.lookup("margin-top", "margin", zero) as LengthValue).toPx()
+        dimensions.margin.bottom =
+                (styledNode.lookup("margin-bottom", "margin", zero) as LengthValue).toPx()
 
-        dimensions.border.top = styledNode.lookup("border-top-width", "border-width", zero).toPx()
-        dimensions.border.bottom = styledNode.lookup("border-bottom-width", "border-width", zero).toPx()
+        dimensions.border.top =
+                (styledNode.lookup("border-top-width", "border-width", zero) as LengthValue).toPx()
+        dimensions.border.bottom =
+                (styledNode.lookup("border-bottom-width", "border-width", zero) as LengthValue).toPx()
 
-        dimensions.padding.top = styledNode.lookup("padding-left", "padding", zero).toPx()
-        dimensions.padding.bottom = styledNode.lookup("padding-right", "padding", zero).toPx()
+        dimensions.padding.top =
+                (styledNode.lookup("padding-left", "padding", zero) as LengthValue).toPx()
+        dimensions.padding.bottom =
+                (styledNode.lookup("padding-right", "padding", zero) as LengthValue).toPx()
 
         dimensions.content.width = maxLineWidth
         dimensions.content.height = totalHeight
 
-        dimensions.content.x = containingBlock.content.x + dimensions.margin.left
-        +dimensions.padding.left + dimensions.border.left
+        dimensions.content.x = containingBlock.content.x + dimensions.margin.left + dimensions.padding.left + dimensions.border.left
         dimensions.content.y = containingBlock.content.y
     }
 
-    internal override fun layout(containingBlock: Dimensions, renderBackend: Renderer) {
+    override fun layout(containingBlock: Dimensions, renderBackend: Renderer) {
         // TODO inline layout as per
         // http://www.w3.org/TR/CSS2/visuren.html#inline-boxes
         // and http://www.w3.org/TR/CSS2/visuren.html#inline-formatting
@@ -96,7 +100,7 @@ class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayout
         if (domNode.type == NodeType.TEXT) {
             val nodeText = (domNode as TextNode).text
             val iter = AttributedString(nodeText).iterator
-            val renderContext = renderBackend.graphicsContext.fontRenderContext
+            val renderContext = renderBackend.fontRenderContext
 
             val measurer = LineBreakMeasurer(iter, renderContext)
             val contentMaxWidth = dimensions.content.width
@@ -129,8 +133,8 @@ class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayout
         val width = auto
         val zero = LengthValue(0f, Unit.PX)
 
-        var marginLeft = styledNode.lookup("margin-left", "margin", zero)
-        var marginRight = styledNode.lookup("margin-right", "margin", zero)
+        var marginLeft: Value = styledNode.lookup("margin-left", "margin", zero)
+        var marginRight: Value = styledNode.lookup("margin-right", "margin", zero)
 
         val borderLeft = styledNode.lookup("border-left-width", "border-width", zero)
         val borderRight = styledNode.lookup("border-right-width", "border-width", zero)
@@ -138,7 +142,10 @@ class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayout
         val paddingLeft = styledNode.lookup("padding-left", "padding", zero)
         val paddingRight = styledNode.lookup("padding-right", "padding", zero)
 
-        val total = listOf(marginLeft, marginRight, borderLeft, borderRight, paddingLeft, paddingRight, width).map { v -> v.toPx() }.sum()
+        val total = listOf(marginLeft, marginRight, borderLeft, borderRight, paddingLeft, paddingRight, width)
+                .filterIsInstance<LengthValue>()
+                .map(LengthValue::toPx)
+                .sum()
 
         val containingWidth = containingBlock.content.width
         if (total > containingWidth) {
@@ -168,8 +175,8 @@ class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayout
         dimensions.border.left = borderLeft.toPx()
         dimensions.border.right = borderRight.toPx()
 
-        dimensions.margin.left = marginLeft.toPx()
-        dimensions.margin.right = marginRight.toPx()
+        dimensions.margin.left = (marginLeft as LengthValue).toPx()
+        dimensions.margin.right = (marginRight as LengthValue).toPx()
 
         if (containingWidth > total) {
             dimensions.content.width = containingWidth - total
@@ -180,11 +187,11 @@ class InlineBox(override val styledNode: StyledNode) : LayoutBox(), StyledLayout
 
     inner class LineBox(private val inlineRoot: InlineBox) {
         private val fragments: MutableList<Fragment>
-        var filledWidth: Float = 0.toFloat()
+        var filledWidth: Float = 0f
             private set
-        var boxHeight: Float = 0.toFloat()
+        var boxHeight: Float = 0f
             private set
-        var lineHeight: Float = 0.toFloat()
+        var lineHeight: Float = 0f
             private set
 
         init {

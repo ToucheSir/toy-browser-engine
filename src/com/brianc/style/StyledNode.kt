@@ -2,9 +2,7 @@ package com.brianc.style
 
 import java.util.HashMap
 import java.util.Optional
-import java.util.stream.Collectors
 
-import com.brianc.css.Declaration
 import com.brianc.css.KeywordValue
 import com.brianc.css.Rule
 import com.brianc.css.Selector
@@ -16,20 +14,17 @@ import com.brianc.dom.ElementNode
 import com.brianc.dom.Node
 import com.brianc.dom.NodeType
 
-class StyledNode(val node: Node, internal var specifiedValues:
+class StyledNode(val node: Node, var values: Map<String, Value>, val children: List<StyledNode>) {
 
-Map<String, Value>, val children: List<StyledNode>) {
-
-    fun value(name: String): Optional<Value> {
-        return Optional.ofNullable<Value>(specifiedValues[name]).map({ `val` -> `val`.clone() })
-    }
-
-    fun lookup(name: String, fallbackName: String, defaultVal: Value): Value {
-        return value(name).orElseGet { value(fallbackName).orElse(defaultVal.clone()) }
-    }
+    inline fun <reified T: Value> lookup(name: String, fallbackName: String, defaultVal: T): T =
+        (values[name] ?: values[fallbackName]) as? T ?: defaultVal
 
     fun display(): Display {
-        return value("display").map({ `val` -> `val` as KeywordValue }).map({ it.value }).map({ Display.find(it) }).orElseGet { Display.INLINE }
+        val value = values["display"]
+        return when (value) {
+            is KeywordValue -> Display.find(value.keyword)
+            else -> Display.INLINE
+        }
     }
 
     companion object {
@@ -69,7 +64,7 @@ Map<String, Value>, val children: List<StyledNode>) {
             val sortedRules = rules.sortedBy { it.s }
             for (m in sortedRules) {
                 for (declaration in m.r.declarations) {
-                    values.put(declaration.name, declaration.value.clone())
+                    values.put(declaration.name, declaration.value)
                 }
             }
 
